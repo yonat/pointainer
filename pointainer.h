@@ -25,7 +25,8 @@
  *    NO_MEMBER_TEMPLATES.
  *
  * Written 10-Jan-1999 by Yonat Sharon <yonat@ootips.org>
- * Last updated 07-Feb-1999
+ * Last updated 14-Mar-2012
+ * http://ootips.org/yonat/4dev/pointainer.h
  */
 
 #ifndef POINTAINER_H
@@ -63,19 +64,19 @@ public:
     size_type erase(const value_type& v)
     {
         iterator i = find(v);
-        size_type found(i != end()); // can't have more than 1
+        size_type found(i != Cnt::end()); // can't have more than 1
         if (found)
             erase(i);
         return found;
     }
 
     // for sequence containers: pop_front(), pop_back(), resize() and assign()
-    void pop_front()    {clean(begin()); Cnt::pop_front();}
-    void pop_back()     {iterator i(end()); clean(--i); Cnt::pop_back();}
+    void pop_front()    {clean(Cnt::begin()); Cnt::pop_front();}
+    void pop_back()     {iterator i(Cnt::end()); clean(--i); Cnt::pop_back();}
     void resize(size_type s, value_type c = value_type())
     {
-        if (s < size())
-            clean(begin()+s, end());
+        if (s < Cnt::size())
+            clean(Cnt::begin()+s, Cnt::end());
         Cnt::resize(s, c);
     }
 #ifndef NO_MEMBER_TEMPLATES
@@ -100,7 +101,7 @@ public:
     // for std::list: remove() and remove_if()
     void remove(const value_type& v)
     {
-        clean( std::find(begin(), end(), v) );
+        clean( std::find(Cnt::begin(), Cnt::end(), v) );
         Cnt::remove(v);
     }
 #ifndef NO_MEMBER_TEMPLATES
@@ -110,7 +111,7 @@ public:
 #endif
     void remove_if(Pred pr)
     {
-        for (iterator i = begin(); i != end(); ++i)
+        for (iterator i = Cnt::begin(); i != Cnt::end(); ++i)
             if (pr(*i))
                 clean(i);
         Cnt::remove_if(pr);
@@ -119,7 +120,7 @@ public:
 private:
     void clean(iterator i)                  {delete *i;}
     void clean(iterator f, iterator l)      {while (f != l) clean(f++);}
-    void clean_all()                        {clean( begin(), end() );}
+    void clean_all()                        {clean( Cnt::begin(), Cnt::end() );}
 
     // we can't have two pointainers own the same objects:
     pointainer(const its_type&) {}
